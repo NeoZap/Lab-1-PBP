@@ -12,6 +12,7 @@
         $("form#wishlist-form").submit(function (e) {
             e.preventDefault();
             var actionURL = event.currentTarget.action;
+            var formData = $("form#wishlist-form").serialize();
             console.log(formData);
             $.ajax({
                 url: actionURL,
