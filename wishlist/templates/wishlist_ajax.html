@@ -12,15 +12,15 @@
         $("form#wishlist-form").submit(function (e) {
             e.preventDefault();
             var actionURL = event.currentTarget.action;
-            var formData = $("form#wishlist-form").serialize();
+            var formData = $(this).serialize();
             console.log(formData);
             $.ajax({
                 url: actionURL,
                 type: "POST",
                 data: formData,
-                success: (response) => {
+                success: (data) => {
                     var tr = $("<tr></tr>");
-                    for (const [key, value] of Object.entries(response)) {
+                    for (const [key, value] of Object.entries(data)) {
                         var td = $("<td></td>").html(value);
                         tr.append(td);
                     }
