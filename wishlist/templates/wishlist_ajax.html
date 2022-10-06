@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block meta %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        getWishlistData();
+        postWishlistData();
+    });
+
+    function postWishlistData() {
+        $("form#wishlist-form").submit(function (e) {
+            e.preventDefault();
+            var actionURL = event.currentTarget.action;
+            console.log(formData);
+            $.ajax({
+                url: actionURL,
+                type: "POST",
+                data: formData,
+                success: (response) => {
+                    var tr = $("<tr></tr>");
+                    for (const [key, value] of Object.entries(response)) {
+                        var td = $("<td></td>").html(value);
+                        tr.append(td);
+                    }
+                    $(".wishlist-table").append(tr);
+                },
+                error: (error) => {
+                    console.log(error);
+                    alert("Error!");
+                }
+            });
+        });
+    }
+
+    function getWishlistData() {
+        $.get("../json/", function (data) {
+            data.forEach(wishlistData => {
+                var wishlistFields = wishlistData.fields;
+                var tr = $("<tr></tr>");
+                for (const [key, value] of Object.entries(wishlistFields)) {
+                    var td = $("<td></td>").html(value);
+                    tr.append(td);
+                }
+                $(".wishlist-table").append(tr);
+            });
+        });
+    }
+</script>
+{% endblock meta %}
+
+{% block logout %}
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+            <form class="form-inline">
+                <a class="nav-link active" href="{% url 'wishlist:logout' %}"><button class="btn btn-outline-success"
+                        type="button">Logout</button></a>
+            </form>
+        </li>
+    </ul>
+</div>
+{% endblock logout %}
+
+{% block content %}
+<h5>Nama: </h5>
+<p>{{nama}}</p>
+
+<table class="wishlist-table">
+    <tr>
+        <th>Nama Barang</th>
+        <th>Harga Barang</th>
+        <th>Deskripsi</th>
+    </tr>
+</table>
+
+<form action="{% url 'wishlist:add_wishlist_ajax' %}" method="POST" id="wishlist-form">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="nama_barang">Nama Barang</label>
+        <input type="text" class="form-control" id="nama_barang" name="nama_barang" placeholder="Nama Barang">
+    </div>
+    <div class="form-group">
+        <label for="harga_barang">Harga Barang</label>
+        <input type="text" class="form-control" id="harga_barang" name="harga_barang" placeholder="Harga Barang">
+    </div>
+    <div class="form-group">
+        <label for="deskripsi">Deskripsi</label>
+        <input type="text" class="form-control" id="deskripsi" name="deskripsi" placeholder="Deskripsi">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<h5>Sesi terakhir login: {{ last_login }}</h5>
+<button><a href="{% url 'wishlist:logout' %}">Logout</a></button>
+{% endblock content %}

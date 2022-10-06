@@ -1,5 +1,5 @@
 import datetime
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse 
 from django.urls import reverse
 from django.shortcuts import render
 from django.shortcuts import render
@@ -22,6 +22,26 @@ def show_wishlist(request):
         'last_login': request.COOKIES.get('last_login'),
     }
     return render(request, "wishlist.html", context)
+
+@login_required(login_url='/wishlist/login/')
+def show_wishlist_ajax(request):
+    data_barang_wishlist = BarangWishlist.objects.all()
+    context = {
+        'list_barang': data_barang_wishlist,
+        'nama': 'Aushaaf Fadhilah Azzah',
+        'last_login': request.COOKIES.get('last_login'),
+    }
+    return render(request, "wishlist_ajax.html", context)
+
+@login_required(login_url='/wishlist/login/')
+def add_wishlist_ajax(request):
+    if request.method == "POST":
+        nama = request.POST.get('nama_barang')
+        harga = request.POST.get('harga_barang')
+        deskripsi = request.POST.get('deskripsi')
+        barang = BarangWishlist(nama_barang=nama, harga_barang=harga, deskripsi=deskripsi)
+        barang.save()
+        return JsonResponse({'nama_barang':nama, 'harga_barang':harga, 'deskripsi':deskripsi})
 
 def show_XML(request):
     data = BarangWishlist.objects.all()
